@@ -377,21 +377,23 @@ app.use((err, req, res, next) => {
   console.error("Error:", err.stack);
   res.status(500).json({ error: err.message || "Error interno del servidor" });
 });
-
 // ===== INICIALIZACIÓN DEL SERVIDOR =====
 const socketIO = initializeSocketServer(server);
 app.set('io', socketIO);
 
 const SERVER_PORT = process.env.PORT || 5000;
+const HOST = process.env.NODE_ENV === 'production' ? '0.0.0.0' : 'localhost';
 
 mongoose
   .connect(process.env.MONGODB_URI)
   .then(() => {
     console.log("✅ Conectado a MongoDB");
+    console.log(`📊 Base de datos: ${mongoose.connection.name}`);
     
-    server.listen(SERVER_PORT, () => {
+    server.listen(SERVER_PORT, HOST, () => {
       console.log(`🚀 Servidor HTTP y Socket.IO corriendo en puerto ${SERVER_PORT}`);
-      console.log(`🌐 Servidor disponible en: http://localhost:${SERVER_PORT}`);
+      console.log(`🌐 Servidor disponible en: http://${HOST}:${SERVER_PORT}`);
+      console.log(`🔧 Modo: ${process.env.NODE_ENV || 'development'}`);
       
       console.log("\n" + "=".repeat(60));
       console.log("📋 RUTAS PRINCIPALES REGISTRADAS:");
@@ -419,6 +421,7 @@ mongoose
     });
   })
   .catch((error) => {
-    console.error("❌ Error conectando a MongoDB:", error);
+    console.error("❌ Error conectando a MongoDB:", error.message);
+    console.error("🔧 Verifica tu MONGODB_URI en las variables de entorno");
     process.exit(1);
   });
