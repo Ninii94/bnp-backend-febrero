@@ -1,0 +1,44 @@
+{
+  "name": "bnp-plat-server",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "init-db": "node scripts/initDB.js"
+  },
+  "dependencies": {
+    "@emailjs/nodejs": "^5.0.2",
+    "amadeus": "^11.0.0",
+    "axios": "^1.10.0",
+    "bcryptjs": "^2.4.3",
+    "cloudinary": "^1.41.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.18.2",
+    "express-validator": "^7.2.1",
+    "jsonwebtoken": "^9.0.0",
+    "mercadopago": "^2.3.0",
+    "moment-timezone": "^0.5.47",
+    "mongoose": "^7.0.3",
+    "multer": "^1.4.5-lts.1",
+    "multer-storage-cloudinary": "^4.0.0",
+    "node-cron": "^3.0.3",
+    "nodemailer": "^6.10.1",
+    "pdfkit": "^0.16.0",
+    "resend": "^1.1.0",
+    "setinterval": "^0.2.4",
+    "socket.io": "^4.8.1",
+    "vite": "^6.1.0"
+  },
+  "env": {
+    "NODE_CRON_SKIP_TIMEOUT_VALIDATION": "true"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

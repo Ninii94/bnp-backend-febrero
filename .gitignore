@@ -1,0 +1,23 @@
+# Dependencias
+node_modules/
+
+# Env variables
+.env
+.env.local
+.env.production
+
+# subidas
+uploads/*
+!uploads/.gitkeep
+
+# Logs
+logs/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
