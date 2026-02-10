@@ -20,33 +20,33 @@ const resetAnalytics = async () => {
   try {
     const result = await Ticket.updateMany({}, {
       $set: {
-        // Reset time-related metrics
+      
         'metricas.tiempo_resolucion.minutos': 0,
         'metricas.tiempo_resolucion.horas': 0,
         'metricas.tiempo_resolucion.dias': 0,
         'metricas.tiempo_resolucion.semanas': 0,
 
-        // Reset interaction metrics
+      
         'metricas.numero_interacciones': 0,
         'metricas.reabierto': false,
         'metricas.veces_reabierto': 0,
 
-        // Reset status tracking
+      
         'ultima_actualizacion': new Date(),
         'tiempos_respuesta.inicio': new Date(),
         'tiempos_respuesta.resolucion': null,
 
-        // Reset tracking arrays
+        
         'seguimiento': [],
       },
-      // Use $unset to completely remove and reset complex fields
+      
       $unset: {
         'satisfaccion': '',
         'encuesta': ''
       }
     });
 
-    // After unsetting, set default structures
+  
     await Ticket.updateMany({}, {
       $set: {
         'satisfaccion': {

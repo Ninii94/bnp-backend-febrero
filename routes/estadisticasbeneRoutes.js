@@ -8,10 +8,10 @@ const router = express.Router();
 // Obtener estadísticas generales de beneficiarios
 router.get("/beneficiarios", checkAuth, isEquipoBNP, async (req, res) => {
   try {
-    // Contar total de beneficiarios
+  
     const totalBeneficiarios = await Beneficiario.countDocuments();
 
-    // Contar beneficiarios con llave única activa
+  
     const llaveUnicaActiva = await Beneficiario.countDocuments({
       "codigo.activo": true,
     });
