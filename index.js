@@ -76,7 +76,7 @@ import bienvenidaRoutes from './routes/bienvenidaRoutes.js';
 import mensajesPagoRoutes from './routes/mensajePago.js';
 import perfilRoutes from './routes/perfilRoutes.js';
 import estadisticasBeneRoutes from './routes/estadisticasBeneRoutes.js';
-import ticketsEstadisticaRoutes from './routes/ticketEstadisticaRoutes.js'
+import ticketsEstadisticaRoutes from './routes/ticketsEstadisticaRoutes.js'
 import aliadoBeneficiariosRoutes from './routes/aliadoBeneficiariosRoutes.js'
 import { configurarBitacoraCentral } from './middleware/bitacoraCentralMiddleware.js';
 
