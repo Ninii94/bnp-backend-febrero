@@ -147,6 +147,8 @@ const corsOptions = {
     'http://localhost:5173',
     'https://beneficiosbnp.com.br',
     'https://www.beneficiosbnp.com.br',
+     'https://plat-bnp.vercel.app',
+      'https://plat-bnp-git-main-stefany-montenegro-pastranas-projects.vercel.app',
     process.env.FRONTEND_URL,
     /\.railway\.app$/
   ],
