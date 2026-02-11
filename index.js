@@ -79,7 +79,40 @@ import estadisticasBeneRoutes from './routes/estadisticasBeneRoutes.js'
 import ticketsEstadisticaRoutes from './routes/ticketsEstadisticaRoutes.js'
 import aliadoBeneficiariosRoutes from './routes/aliadoBeneficiariosRoutes.js'
 import { configurarBitacoraCentral } from './middleware/bitacoraCentralMiddleware.js';
+mongoose.set('strictQuery', false);
+mongoose.set('bufferCommands', false);
 
+const MONGODB_OPTIONS = {
+  serverSelectionTimeoutMS: 30000,
+  socketTimeoutMS: 45000,
+  maxPoolSize: 10,
+  minPoolSize: 2,
+  maxIdleTimeMS: 30000,
+  retryWrites: true,
+  retryReads: true,
+  connectTimeoutMS: 30000,
+  heartbeatFrequencyMS: 10000
+};
+
+// Función de conexión con reintentos
+const connectWithRetry = async () => {
+  try {
+    await mongoose.connect(process.env.MONGODB_URI, MONGODB_OPTIONS);
+    console.log("✅ Conectado a MongoDB");
+    console.log(`📊 Base de datos: ${mongoose.connection.name}`);
+    return true;
+  } catch (error) {
+    console.error("❌ Error conectando a MongoDB:", error.message);
+    console.log("🔄 Reintentando conexión en 5 segundos...");
+    await new Promise(resolve => setTimeout(resolve, 5000));
+    return connectWithRetry();
+  }
+};
+
+// Manejo de eventos de Mongoose
+mongoose.connection.on('disconnected', () => {
+  console.log('⚠️ Mongoose desconectado de MongoDB. Intentando reconectar...');
+});
 // ===== CONFIGURACIÓN =====
 
 connectDB();
@@ -384,44 +417,26 @@ app.set('io', socketIO);
 const SERVER_PORT = process.env.PORT || 5000;
 const HOST = process.env.NODE_ENV === 'production' ? '0.0.0.0' : 'localhost';
 
-mongoose
-  .connect(process.env.MONGODB_URI)
-  .then(() => {
-    console.log("✅ Conectado a MongoDB");
-    console.log(`📊 Base de datos: ${mongoose.connection.name}`);
+// Función autoejecutable para iniciar DB y luego Servidor
+(async () => {
+  try {
+    await connectWithRetry();
     
     server.listen(SERVER_PORT, HOST, () => {
-      console.log(`🚀 Servidor HTTP y Socket.IO corriendo en puerto ${SERVER_PORT}`);
-      console.log(`🌐 Servidor disponible en: http://${HOST}:${SERVER_PORT}`);
+      console.log("\n" + "=".repeat(60));
+      console.log(`🚀 Servidor corriendo en: http://${HOST}:${SERVER_PORT}`);
       console.log(`🔧 Modo: ${process.env.NODE_ENV || 'development'}`);
-      
-      console.log("\n" + "=".repeat(60));
-      console.log("📋 RUTAS PRINCIPALES REGISTRADAS:");
-      console.log("=".repeat(60));
-      console.log("   ✅ /api/auth - Autenticación");
-      console.log("   ✅ /api/servicios - Servicios y beneficios");
-      console.log("   ✅ /api/beneficiario - Beneficiarios");
-      console.log("   ✅ /api/equipo - Equipo BNP");
-      console.log("   ✅ /api/fondos - Sistema de fondos");
-      console.log("   ✅ /api/metodos-pago - Métodos de pago");
-      console.log("   ✅ /api/aliados - Aliados");
-      console.log("   ✅ /api/chat - Sistema de chat");
-      console.log("   ✅ /api/perfil - Estadísticas y perfil");
-      
-      console.log("\n" + "=".repeat(60));
-      console.log("🔍 DEBUG ENDPOINTS:");
-      console.log("=".repeat(60));
-      console.log("   🔍 GET /api/debug/status");
-      console.log("   🔍 GET /api/debug/chat-status");
-      console.log("   🔍 GET /api/health");
-      
-      console.log("\n" + "=".repeat(60));
-      console.log("🎉 SERVIDOR LISTO Y FUNCIONANDO");
       console.log("=".repeat(60));
     });
-  })
-  .catch((error) => {
-    console.error("❌ Error conectando a MongoDB:", error.message);
-    console.error("🔧 Verifica tu MONGODB_URI en las variables de entorno");
+  } catch (error) {
+    console.error("❌ Error fatal iniciando servidor:", error);
     process.exit(1);
-  });
+  }
+})();
+
+// Manejo de cierre limpio (Graceful Shutdown)
+process.on('SIGINT', async () => {
+  await mongoose.connection.close();
+  console.log('✅ Conexión MongoDB cerrada. App terminada.');
+  process.exit(0);
+});
